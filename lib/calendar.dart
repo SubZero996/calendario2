@@ -41,7 +41,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
           }
           final obj =
               eventT.where((objeto) => objeto.date == element.date).toList();
-          events.addAll({element.date: obj.map((e) => Event(e.name)).toList()});
+          events.addAll(
+              {element.date: obj.map((e) => Event(e.name, e.id)).toList()});
         }
       });
     });
@@ -58,7 +59,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 
   List<Event> _getEventsForDay(DateTime day) {
     // Implementation example
-    if(events.containsKey(day)){
+    if (events.containsKey(day)) {
       // ignore: avoid_print
       print({'events': day});
     }
@@ -144,7 +145,24 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
-                      _selectedEvents.value = _getEventsForDay(selectedDay);
+                      dao.getall().then((value) {
+                        setState(() {
+                          users = value;
+                          final eventT = users;
+                          for (var element in eventT) {
+                            if (!events.containsKey(element.date)) {
+                              events[element.date] = [];
+                            }
+                            final obj = eventT
+                                .where((objeto) => objeto.date == element.date)
+                                .toList();
+                            events.addAll({
+                              element.date:
+                                  obj.map((e) => Event(e.name, e.id)).toList()
+                            });
+                          }
+                        });
+                      });
                     },
                     child: const Text("Agregar"),
                   )
@@ -208,8 +226,9 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                         title: Text('${value[index]}'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () {
+                          onPressed: () async {
                             // Eliminar el evento
+                            await eventDao.delete(value[index].id);
                             _deleteEvent(value[index]);
                           },
                         ),

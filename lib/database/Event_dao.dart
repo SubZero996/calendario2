@@ -20,7 +20,7 @@ class EventDao {
         .update('eventos', user.toMap(), where: 'id = ?', whereArgs: [user.id]);
   }
 
-  Future<void> delete(EventModel user) async {
-    await database.delete('eventos', where: 'id = ?', whereArgs: [user.id]);
+  Future<void> delete(int id) async {
+    await database.delete('eventos', where: 'id = ?', whereArgs: [id]);
   }
 }
